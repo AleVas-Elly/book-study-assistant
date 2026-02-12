@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-multipart
+sqlalchemy
+pytest
+httpx
+psycopg2-binary
+pypdf
+google-generativeai
