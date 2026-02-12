@@ -25,15 +25,14 @@ export const uploadPdf = async (file: File): Promise<{ filename: string; status:
 
 export const sendChatMessage = async (
     message: string,
-    bookId: number,
-    apiKey?: string
+    bookId: number
 ): Promise<{ response: string }> => {
     const response = await fetch(`${API_BASE_URL}/chat`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message, book_id: bookId, api_key: apiKey }),
+        body: JSON.stringify({ message, book_id: bookId }),
     });
 
     if (!response.ok) {

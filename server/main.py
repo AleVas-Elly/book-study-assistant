@@ -71,7 +71,6 @@ async def upload_pdf(file: UploadFile = File(...), db: Session = Depends(get_db)
 async def chat_with_book(
     message: str = Body(...),
     book_id: int = Body(...),
-    api_key: str = Body(None),
     db: Session = Depends(get_db)
 ):
     # 1. Get Book Content
@@ -80,11 +79,10 @@ async def chat_with_book(
         raise HTTPException(status_code=404, detail="Book not found")
     
     # 2. Configure Gemini
-    # Priority: User provided key > Environment variable
-    key_to_use = api_key or os.getenv("GEMINI_API_KEY")
+    key_to_use = os.getenv("GEMINI_API_KEY")
     
     if not key_to_use:
-        return {"error": "API Key required. Please provide it in settings or set GEMINI_API_KEY env var."}
+        return {"error": "Server API Key not configured."}
     
     try:
         genai.configure(api_key=key_to_use)

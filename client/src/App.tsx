@@ -12,7 +12,6 @@ function App() {
   // App State: 'upload' | 'chat'
   const [appState, setAppState] = useState<'upload' | 'chat'>('upload');
   const [bookId, setBookId] = useState<number | null>(null);
-  const [apiKey, setApiKey] = useState<string>('');
 
   // Upload State
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
@@ -28,10 +27,6 @@ function App() {
     checkHealth()
       .then((data) => setHealthStatus(data.status))
       .catch(() => setHealthStatus('Offline'));
-
-    // Load API key from local storage if available
-    const savedKey = localStorage.getItem('gemini_api_key');
-    if (savedKey) setApiKey(savedKey);
   }, []);
 
   useEffect(() => {
@@ -40,12 +35,6 @@ function App() {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleApiKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const key = e.target.value;
-    setApiKey(key);
-    localStorage.setItem('gemini_api_key', key);
   };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +77,7 @@ function App() {
     setIsTyping(true);
 
     try {
-      const result = await sendChatMessage(userMsg, bookId, apiKey);
+      const result = await sendChatMessage(userMsg, bookId);
       setMessages(prev => [...prev, { role: 'assistant', content: result.response }]);
     } catch (error) {
       console.error(error);
@@ -125,23 +114,6 @@ function App() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-
-        {/* API Key Input (Always visible if empty and in chat mode, or unobtrusive) */}
-        <div className="mb-6">
-          <div className="relative">
-            <input
-              type="password"
-              placeholder="Enter your Gemini API Key (optional if host configured)"
-              value={apiKey}
-              onChange={handleApiKeyChange}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-            />
-            <span className="absolute left-3 top-2.5 text-gray-400">🔑</span>
-          </div>
-          <p className="text-xs text-center text-gray-400 mt-1">
-            Required only if the server doesn't have a default key. <a href="https://aistudio.google.com/app/apikey" target="_blank" className="underline hover:text-indigo-500">Get one free</a>.
-          </p>
-        </div>
 
         {appState === 'upload' ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in-up">
@@ -185,8 +157,8 @@ function App() {
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-sm ${msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-br-none'
-                      : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                    ? 'bg-indigo-600 text-white rounded-br-none'
+                    : 'bg-gray-100 text-gray-800 rounded-bl-none'
                     }`}>
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                   </div>
